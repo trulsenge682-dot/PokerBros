@@ -6,78 +6,79 @@ import { useEffect, useMemo, useRef, useState } from "react";
 function HomePageInner() {
   const [mounted, setMounted] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
-  const [players, setPlayers] = useState([]);
-  const [sessions, setSessions] = useState([]);
 
-  // swiper på mobil
+  const [players, setPlayers] = useState([]);
+  const [sessionsLocal, setSessionsLocal] = useState([]);
+  const [sessionsSeed, setSessionsSeed] = useState([]);
+
+  // mobil-sveip
   const scrollerRef = useRef(null);
-  const [page, setPage] = useState(1); // 1 = Sessions, 2 = Leaderboard
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     setMounted(true);
+    // lokalt
     try {
       const p = JSON.parse(localStorage.getItem("pb_players") || "[]");
       const s = JSON.parse(localStorage.getItem("pb_sessions") || "[]");
       setPlayers(Array.isArray(p) ? p : []);
-      setSessions(Array.isArray(s) ? s : []);
+      setSessionsLocal(Array.isArray(s) ? s : []);
     } catch {}
+
+    // seed sessions (felles)
+    (async () => {
+      try {
+        const res = await fetch("/seed_sessions.json", { cache: "force-cache" });
+        if (res.ok) setSessionsSeed(await res.json());
+      } catch {}
+    })();
+
+    // seed players hvis tomt lokalt
+    (async () => {
+      try {
+        const current = JSON.parse(localStorage.getItem("pb_players") || "[]");
+        if (!Array.isArray(current) || current.length === 0) {
+          const res = await fetch("/seed_players.json", { cache: "force-cache" });
+          if (res.ok) {
+            const arr = await res.json();
+            setPlayers(arr);
+            localStorage.setItem("pb_players", JSON.stringify(arr));
+          }
+        }
+      } catch {}
+    })();
   }, []);
 
   // desktop vs mobil
   useEffect(() => {
-    function apply() {
-      setIsDesktop(window.innerWidth >= 1000);
-    }
+    function apply() { setIsDesktop(window.innerWidth >= 1000); }
     apply();
     window.addEventListener("resize", apply);
     return () => window.removeEventListener("resize", apply);
   }, []);
 
-  // leaderboard-data
+  // slå sammen seed + lokal
+  const sessions = useMemo(() => [...sessionsSeed, ...sessionsLocal], [sessionsSeed, sessionsLocal]);
+
+  // leaderboard
   const leaderboard = useMemo(() => {
     const totals = {};
     sessions.forEach(sess => {
-      sess.entries.forEach(e => {
-        totals[e.playerId] = (totals[e.playerId] || 0) + e.amount;
-      });
+      sess.entries.forEach(e => { totals[e.playerId] = (totals[e.playerId] || 0) + e.amount; });
     });
-    return players
-      .map(p => ({ id: p.id, name: p.name, color: p.color, total: totals[p.id] || 0 }))
-      .sort((a, b) => b.total - a.total);
+    // navneoppslag fra players
+    return Object.keys(totals).map(id => {
+      const p = players.find(x => x.id === id);
+      return { id, name: p ? p.name : id, color: p?.color, total: totals[id] || 0 };
+    }).sort((a, b) => b.total - a.total);
   }, [players, sessions]);
 
   // styles
-  const C = {
-    panel: "#0f141b",
-    border: "rgba(255,255,255,0.08)",
-    text: "#e5e7eb",
-    dim: "#9aa4b2",
-    good: "#10b981",
-    bad: "#f43f5e",
-    accent: "#7c3aed"
-  };
+  const C = { panel: "#0f141b", border: "rgba(255,255,255,0.08)", text: "#e5e7eb", dim: "#9aa4b2", good: "#10b981", bad: "#f43f5e", accent: "#7c3aed" };
   const card = { background: C.panel, border: `1px solid ${C.border}`, borderRadius: "14px", boxShadow: "0 8px 24px rgba(0,0,0,0.35)" };
   const row = { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", borderBottom: `1px solid ${C.border}`, fontVariantNumeric: "tabular-nums" };
   const pageStyle = { minWidth: "100%", scrollSnapAlign: "start", padding: "12px 14px", boxSizing: "border-box" };
 
-  // swiper helpers (mobil)
-  function onScroll() {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const w = el.clientWidth || 1;
-    const p = Math.round(el.scrollLeft / w) + 1;
-    if (p !== page) setPage(p);
-  }
-  function go(n) {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const w = el.clientWidth;
-    el.scrollTo({ left: w * (n - 1), behavior: "smooth" });
-  }
-
-  if (!mounted) return null;
-
-  // gjenbrukte seksjoner
   function SessionsList() {
     return (
       <div style={{ ...card }}>
@@ -133,17 +134,26 @@ function HomePageInner() {
     );
   }
 
-  // desktop layout
-  if (isDesktop) {
+  // mobil-sveip
+  function onScroll() {
+    const el = scrollerRef.current; if (!el) return;
+    const w = el.clientWidth || 1; const p = Math.round(el.scrollLeft / w) + 1;
+    if (p !== page) setPage(p);
+  }
+  function go(n) {
+    const el = scrollerRef.current; if (!el) return;
+    const w = el.clientWidth; el.scrollTo({ left: w * (n - 1), behavior: "smooth" });
+  }
+
+  if (!mounted) return null;
+
+  // desktop
+  const isDesktopNow = isDesktop;
+
+  if (isDesktopNow) {
     return (
-      <div
-        style={{
-          padding: "14px",
-          height: "calc(100dvh - 96px)",
-          boxSizing: "border-box",
-          fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial'
-        }}
-      >
+      <div style={{ padding: "14px", height: "calc(100dvh - 96px)", boxSizing: "border-box",
+        fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial' }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: "14px", height: "100%" }}>
           <div style={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
             <h2 style={{ margin: "0 0 10px 2px", fontSize: "18px" }}>Sessions</h2>
@@ -158,7 +168,7 @@ function HomePageInner() {
     );
   }
 
-  // mobil layout med sveip
+  // mobil
   return (
     <div
       style={{
@@ -214,5 +224,4 @@ function HomePageInner() {
   );
 }
 
-// slå av SSR for å unngå hydration-feil
 export default dynamic(() => Promise.resolve(HomePageInner), { ssr: false });

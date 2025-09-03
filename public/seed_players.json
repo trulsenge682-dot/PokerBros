@@ -1,0 +1,11 @@
+[
+  { "id": "truls",    "name": "Truls",    "color": "#ff6b6b" },
+  { "id": "johannes", "name": "Johannes", "color": "#ffd166" },
+  { "id": "emil",     "name": "Emil",     "color": "#06d6a0" },
+  { "id": "magnus",   "name": "Magnus",   "color": "#4cc9f0" },
+  { "id": "viktor",   "name": "Viktor",   "color": "#f72585" },
+  { "id": "nikolai",  "name": "Nikolai",  "color": "#a78bfa" },
+  { "id": "noah",     "name": "Noah",     "color": "#cbd5e1" },
+  { "id": "even",     "name": "Even",     "color": "#22d3ee" },
+  { "id": "sander",   "name": "Sander",   "color": "#34d399" }
+]

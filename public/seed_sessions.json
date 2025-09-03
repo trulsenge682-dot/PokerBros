@@ -1,0 +1,60 @@
+[
+  {
+    "id": 1,
+    "date": "2025-07-10",
+    "entries": [
+      { "playerId": "emil",     "amount": -150 },
+      { "playerId": "sander",   "amount": -150 },
+      { "playerId": "magnus",   "amount": -150 },
+      { "playerId": "johannes", "amount": -29 },
+      { "playerId": "nikolai",  "amount": 5 },
+      { "playerId": "viktor",   "amount": 481 },
+      { "playerId": "even",     "amount": 206 },
+      { "playerId": "noah",     "amount": -44 },
+      { "playerId": "truls",    "amount": -150 }
+    ]
+  },
+  {
+    "id": 2,
+    "date": "2025-07-24",
+    "entries": [
+      { "playerId": "nikolai",  "amount": 115.5 },
+      { "playerId": "viktor",   "amount": -54 },
+      { "playerId": "noah",     "amount": -100 },
+      { "playerId": "magnus",   "amount": 416.5 },
+      { "playerId": "truls",    "amount": -100 },
+      { "playerId": "johannes", "amount": -250 },
+      { "playerId": "sander",   "amount": 60.5 },
+      { "playerId": "even",     "amount": -100 }
+    ]
+  },
+  {
+    "id": 3,
+    "date": "2025-08-05",
+    "entries": [
+      { "playerId": "emil",     "amount": 61.5 },
+      { "playerId": "noah",     "amount": -100 },
+      { "playerId": "magnus",   "amount": 282.5 },
+      { "playerId": "viktor",   "amount": 69 },
+      { "playerId": "sander",   "amount": -100 },
+      { "playerId": "even",     "amount": -200 },
+      { "playerId": "nikolai",  "amount": -30.5 },
+      { "playerId": "johannes", "amount": 13.5 }
+    ]
+  },
+  {
+    "id": 4,
+    "date": "2025-08-20",
+    "entries": [
+      { "playerId": "viktor",   "amount": 751 },
+      { "playerId": "sander",   "amount": -74 },
+      { "playerId": "johannes", "amount": -206 },
+      { "playerId": "even",     "amount": 80 },
+      { "playerId": "noah",     "amount": 61 },
+      { "playerId": "emil",     "amount": 0 },
+      { "playerId": "magnus",   "amount": -200 },
+      { "playerId": "truls",    "amount": -200 },
+      { "playerId": "nikolai",  "amount": -200 }
+    ]
+  }
+]
